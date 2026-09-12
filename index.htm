@@ -44,8 +44,8 @@
     <section class="lg:col-span-2 space-y-4">
       <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
-          <label class="text-xs font-semibold text-slate-600">Customer Name</label>
-          <input id="billCustName" oninput="saveCurrentDraft()" type="text" placeholder="Ramesh Carpenter" class="w-full mt-1 px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-neutral-900" />
+          <label class="text-xs font-semibold text-slate-600">Customer Name *</label>
+          <input id="billCustName" oninput="saveCurrentDraft()" type="text" placeholder="e.g. Ramesh Carpenter" class="w-full mt-1 px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-neutral-900 font-semibold" />
         </div>
         <div>
           <label class="text-xs font-semibold text-slate-600">Mobile No. (WhatsApp)</label>
@@ -57,7 +57,7 @@
         </div>
       </div>
 
-      <!-- Add Item Box with explicit Dimension Labels -->
+      <!-- Add Item Form with Dimension Labels -->
       <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-3">
         <div class="flex justify-between items-center">
           <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Item Details</h2>
@@ -72,9 +72,8 @@
           <input id="billItemName" type="text" placeholder="e.g. 19mm Gurjan Club Ply / 1mm Sunmica" class="w-full mt-1 px-3 py-2 border rounded-lg text-sm" />
         </div>
 
-        <!-- Plywood Dimension Fields with clear headers -->
         <div id="billPlyFields" class="bg-amber-50/70 p-3 rounded-xl border border-amber-200">
-          <div class="text-[11px] font-bold text-amber-900 uppercase tracking-wider mb-2">Plywood Sheet Dimensions & Rate</div>
+          <div class="text-[11px] font-bold text-amber-900 uppercase tracking-wider mb-2">Plywood Dimensions & Rate</div>
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Length (Feet)</label>
@@ -95,7 +94,6 @@
           </div>
         </div>
 
-        <!-- General Hardware Fields -->
         <div id="billGenFields" class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200 hidden">
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Quantity (Pcs / Kgs)</label>
@@ -108,7 +106,7 @@
         </div>
 
         <div class="flex justify-between items-center pt-2">
-          <span class="text-xs text-emerald-600 font-semibold" id="autoSaveIndicator">● Auto-Save Active</span>
+          <span class="text-xs text-emerald-600 font-semibold">● Ready</span>
           <button onclick="addBillItem()" class="bg-neutral-900 hover:bg-black text-white px-5 py-2 rounded-lg text-xs font-medium transition">+ Add Item to Bill</button>
         </div>
       </div>
@@ -161,13 +159,15 @@
         </div>
       </div>
 
+      <!-- Payment / Udhaar Option -->
       <div class="space-y-2 pt-2 border-t text-xs">
         <div>
-          <label class="font-semibold text-slate-600">Payment Status</label>
-          <select id="billPayStatus" class="w-full mt-1 border rounded p-1.5 bg-white">
-            <option value="Paid">Full Paid</option>
-            <option value="Credit">Udhaar (Khata)</option>
+          <label class="font-semibold text-slate-700">Payment Option</label>
+          <select id="billPayStatus" class="w-full mt-1 border-2 border-amber-300 rounded-lg p-2 bg-amber-50 font-bold text-neutral-900">
+            <option value="Credit">🔴 Udhaar (Auto Khata Entry)</option>
+            <option value="Paid">🟢 Full Cash / UPI Paid</option>
           </select>
+          <p class="text-[11px] text-slate-500 mt-1">Agar <strong>Udhaar</strong> select kiya, to customer ke khate me ye bill khud-ba-khud jud jayega.</p>
         </div>
       </div>
 
@@ -179,13 +179,13 @@
           💬 Send on WhatsApp
         </button>
         <button onclick="resetBillCounter(true)" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-1.5 rounded-lg text-xs font-medium transition">
-          + Start Blank Bill
+          + Clear / New Bill
         </button>
       </div>
     </section>
   </main>
 
-  <!-- TAB 2: CUSTOMER KHATA (UDHAAR & MAAL WAPIS) -->
+  <!-- TAB 2: KHATA / LEDGER -->
   <main id="ledgerView" class="max-w-6xl mx-auto p-3 sm:p-6 w-full space-y-6 hidden no-print">
     <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
       <div>
@@ -203,11 +203,11 @@
       </div>
     </div>
 
-    <!-- Entry Form with explicit dimension headers -->
+    <!-- Manual Entry Form (Maal / Wapis / Jama) -->
     <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-3">
       <div class="flex justify-between items-center border-b pb-2">
         <h3 id="formModeHeader" class="text-sm font-bold text-slate-800 uppercase tracking-wide">Add Entry (Delivery / Return / Payment)</h3>
-        <span class="text-xs text-slate-400">Date-wise hisaab auto-save hota hai</span>
+        <span class="text-xs text-slate-400">Date-wise hisaab</span>
       </div>
 
       <input type="hidden" id="editEntryId" value="" />
@@ -232,7 +232,7 @@
       </div>
 
       <div id="ledgerGoodsCalcBox" class="p-3 bg-neutral-50 rounded-lg border border-neutral-200">
-        <div class="text-[11px] font-bold text-neutral-600 uppercase mb-2">Dimensions & Amount Calculation</div>
+        <div class="text-[11px] font-bold text-neutral-600 uppercase mb-2">Dimensions & Calculation</div>
         <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
           <div>
             <label class="text-xs font-semibold text-slate-700">Length (ft)</label>
@@ -265,7 +265,7 @@
       </div>
     </div>
 
-    <!-- Ledger Statement Table -->
+    <!-- Ledger Table -->
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
       <div class="p-3 border-b flex justify-between items-center bg-slate-50">
         <h4 class="font-bold text-xs text-slate-700 uppercase tracking-wide">Customer Account Statement</h4>
@@ -294,13 +294,13 @@
     </div>
   </main>
 
-  <!-- TAB 3: BILL HISTORY (WITH DELETE OPTION) -->
+  <!-- TAB 3: BILL HISTORY (WITH PROMINENT RED DELETE BUTTON) -->
   <main id="historyView" class="max-w-6xl mx-auto p-3 sm:p-6 w-full hidden no-print">
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
       <div class="flex justify-between items-center border-b pb-3">
         <div>
           <h3 class="font-bold text-sm text-slate-800 uppercase">Saved Bills History</h3>
-          <p class="text-xs text-slate-500">Yahan se aap kisi bhi purane bill ko Reprint ya Delete kar sakte hain</p>
+          <p class="text-xs text-slate-500">Aap kisi bhi bill ko reprint kar sakte hain ya red button se delete kar sakte hain</p>
         </div>
         <button onclick="loadBillHistory()" class="text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded font-medium">🔄 Refresh</button>
       </div>
@@ -313,7 +313,7 @@
               <th class="p-3">Customer Name</th>
               <th class="p-3">Total Items</th>
               <th class="p-3 text-right">Amount (₹)</th>
-              <th class="p-3">Status</th>
+              <th class="p-3">Payment</th>
               <th class="p-3 text-center">Actions</th>
             </tr>
           </thead>
@@ -564,32 +564,84 @@
       renderBillTable();
     }
 
+    // AUTOMATIC BILL SAVE & AUTOMATIC KHATA (UDHAAR) SYNC
     function saveAndPrintBill() {
       if (currentBillItems.length === 0) return alert('Bill me items add karein!');
+      const custName = document.getElementById('billCustName').value.trim();
+      if (!custName) return alert('Kripya Customer Name zaroor enter karein!');
 
       let counter = parseInt(localStorage.getItem('spw_inv_num') || 1001);
       const invNo = `SPW-${counter}`;
       const grandTotal = document.getElementById('billGrandTotal').innerText;
+      const billDate = document.getElementById('billDate').value;
+      const payStatus = document.getElementById('billPayStatus').value;
+      const custPhone = document.getElementById('billCustPhone').value.trim();
+      const numGrandTotal = parseFloat(grandTotal.replace('₹', '')) || 0;
 
       const invoiceData = {
         invNo: invNo,
-        date: document.getElementById('billDate').value,
-        custName: document.getElementById('billCustName').value.trim() || 'Cash Customer',
-        phone: document.getElementById('billCustPhone').value.trim(),
+        date: billDate,
+        custName: custName,
+        phone: custPhone,
         items: [...currentBillItems],
         subtotal: document.getElementById('billSubtotal').innerText,
         gst: document.getElementById('billGstAmt').innerText,
         discount: document.getElementById('billDiscount').value,
         grandTotal: grandTotal,
-        payStatus: document.getElementById('billPayStatus').value
+        payStatus: payStatus
       };
 
-      const tx = db.transaction("invoices", "readwrite");
+      // 1. Save in Invoices Store
+      const tx = db.transaction(["invoices", "customers", "ledger"], "readwrite");
       tx.objectStore("invoices").add(invoiceData);
+
+      // 2. If Udhaar, AUTO ADD TO CUSTOMER KHATA
+      if (payStatus === 'Credit') {
+        const custStore = tx.objectStore("customers");
+        const ledgerStore = tx.objectStore("ledger");
+
+        custStore.getAll().onsuccess = function(e) {
+          let customers = e.target.result;
+          let foundCust = customers.find(c => c.name.toLowerCase() === custName.toLowerCase());
+
+          const itemsSummary = currentBillItems.map(i => `${i.name} (${i.detail})`).join(', ');
+          const entryDesc = `Bill #${invNo}: ${itemsSummary}`;
+
+          if (foundCust) {
+            ledgerStore.add({
+              customerId: foundCust.id,
+              date: billDate,
+              type: 'goods',
+              description: entryDesc,
+              debit: numGrandTotal,
+              credit: 0,
+              returnAmt: 0
+            });
+          } else {
+            // Customer pehle nahi tha, to auto-create karo
+            const addCustReq = custStore.add({ name: custName, phone: custPhone });
+            addCustReq.onsuccess = function(ev) {
+              const newCustId = ev.target.result;
+              ledgerStore.add({
+                customerId: newCustId,
+                date: billDate,
+                type: 'goods',
+                description: entryDesc,
+                debit: numGrandTotal,
+                credit: 0,
+                returnAmt: 0
+              });
+              refreshCustomerDropdown();
+            };
+          }
+        };
+      }
+
       tx.oncomplete = function() {
         localStorage.setItem('spw_inv_num', counter + 1);
         setNewInvoiceNumber();
 
+        // Trigger Print Layout
         document.getElementById('printDocType').innerText = "TAX INVOICE";
         document.getElementById('pRefNo').innerText = invoiceData.invNo;
         document.getElementById('pName').innerText = invoiceData.custName;
@@ -621,7 +673,7 @@
           <p>GST: ${invoiceData.gst}</p>
           <p>Discount: ₹${invoiceData.discount}</p>
           <p class="text-sm font-black border-t pt-1">Grand Total: ${invoiceData.grandTotal}</p>
-          <p class="text-[10px] text-slate-500 uppercase">Status: ${invoiceData.payStatus}</p>
+          <p class="text-[10px] text-slate-500 uppercase">Status: ${invoiceData.payStatus === 'Credit' ? 'UDHAAR (KHATA AUTO-UPDATED)' : 'PAID'}</p>
         `;
 
         document.getElementById('printArea').classList.remove('hidden');
@@ -652,7 +704,7 @@
       window.open(`https://wa.me/${phone ? '91' + phone : ''}?text=${msg}`, '_blank');
     }
 
-    // TAB 2: KHATA LOGIC
+    // TAB 2: KHATA ENGINE
     function promptNewCustomer() {
       const name = prompt("Customer / Contractor Name:");
       if (!name) return;
@@ -894,7 +946,7 @@
       window.open(`https://wa.me/?text=${msg}`, '_blank');
     }
 
-    // TAB 3: BILL HISTORY & DELETE BILL
+    // TAB 3: BILL HISTORY & DELETE BUTTON
     function loadBillHistory() {
       const tx = db.transaction("invoices", "readonly");
       tx.objectStore("invoices").getAll().onsuccess = function(e) {
@@ -907,25 +959,25 @@
         }
 
         tbody.innerHTML = invoices.map(inv => `
-          <tr class="hover:bg-slate-50 transition">
+          <tr class="hover:bg-slate-50 transition border-b">
             <td class="p-3 font-bold text-neutral-900">${inv.invNo}</td>
             <td class="p-3 text-slate-500">${inv.date}</td>
             <td class="p-3 font-sans font-medium text-slate-800">${inv.custName}</td>
             <td class="p-3 font-sans">${inv.items.length} items</td>
             <td class="p-3 text-right font-bold text-neutral-900">${inv.grandTotal}</td>
-            <td class="p-3"><span class="text-[10px] px-2 py-0.5 rounded ${inv.payStatus === 'Credit' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}">${inv.payStatus}</span></td>
-            <td class="p-3 text-center space-x-3 font-sans">
-              <button onclick="reprintSavedBill(${inv.id})" class="text-blue-600 hover:underline font-medium">Reprint</button>
-              <button onclick="deleteSavedBill(${inv.id})" class="text-red-600 hover:underline font-medium">Delete</button>
+            <td class="p-3"><span class="text-[10px] px-2 py-0.5 rounded font-bold ${inv.payStatus === 'Credit' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-green-100 text-green-700'}">${inv.payStatus === 'Credit' ? 'UDHAAR' : 'PAID'}</span></td>
+            <td class="p-3 text-center space-x-2 font-sans">
+              <button onclick="reprintSavedBill(${inv.id})" class="bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs px-2.5 py-1 rounded font-medium border">Reprint</button>
+              <button onclick="deleteSavedBill(${inv.id})" class="bg-red-600 hover:bg-red-700 text-white text-xs px-2.5 py-1 rounded font-bold shadow-sm">Delete</button>
             </td>
           </tr>
         `).join('');
       };
     }
 
-    // Delete Invoice Permanently
+    // Direct Permanent Delete
     function deleteSavedBill(id) {
-      if (confirm('Kya aap sach me ye bill delete karna chahte hain?')) {
+      if (confirm('Kya aap sach me ye bill permanently delete karna chahte hain?')) {
         const tx = db.transaction("invoices", "readwrite");
         tx.objectStore("invoices").delete(id);
         tx.oncomplete = function() {
