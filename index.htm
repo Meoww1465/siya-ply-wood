@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Siya Ply World - Ledger & Billing</title>
+  <title>Siya Ply World - Billing & Ledger</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @media print {
       body * { visibility: hidden; }
       #printArea, #printArea * { visibility: visible; }
-      #printArea { position: absolute; left: 0; top: 0; width: 100%; }
+      #printArea { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 15px; }
       .no-print { display: none !important; }
     }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
 
-  <!-- Navigation Bar -->
+  <!-- Header -->
   <header class="bg-neutral-900 text-white px-4 py-3 shadow-md flex justify-between items-center no-print">
     <div class="flex items-center space-x-3">
       <div class="w-10 h-10 bg-white rounded-lg p-1 flex items-center justify-center overflow-hidden">
@@ -34,44 +34,45 @@
         <input type="file" accept="image/*" class="hidden" onchange="uploadLogo(event)" />
       </label>
       <button onclick="switchTab('billing')" id="tabBillingBtn" class="bg-amber-600 px-3 py-1.5 rounded-lg text-xs font-medium text-white transition">Counter Bill</button>
-      <button onclick="switchTab('ledger')" id="tabLedgerBtn" class="bg-neutral-800 px-3 py-1.5 rounded-lg text-xs font-medium text-white transition">Customer Khata (Udhaar)</button>
+      <button onclick="switchTab('ledger')" id="tabLedgerBtn" class="bg-neutral-800 px-3 py-1.5 rounded-lg text-xs font-medium text-white transition">Customer Khata (Udhaar / Wapsi)</button>
+      <button onclick="switchTab('history')" id="tabHistBtn" class="bg-neutral-800 px-3 py-1.5 rounded-lg text-xs font-medium text-white transition">Bill History</button>
     </div>
   </header>
 
-  <!-- TAB 1: COUNTER BILLING (Single Instant Invoice) -->
+  <!-- TAB 1: COUNTER BILLING -->
   <main id="billingView" class="max-w-6xl mx-auto p-3 sm:p-6 w-full grid grid-cols-1 lg:grid-cols-3 gap-6 no-print">
     <section class="lg:col-span-2 space-y-4">
       <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
           <label class="text-xs font-semibold text-slate-600">Customer Name</label>
-          <input id="billCustName" type="text" placeholder="Ramesh Carpenter" class="w-full mt-1 px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-neutral-900 outline-none" />
+          <input id="billCustName" oninput="saveCurrentDraft()" type="text" placeholder="Ramesh Carpenter" class="w-full mt-1 px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-neutral-900" />
         </div>
         <div>
-          <label class="text-xs font-semibold text-slate-600">Mobile No.</label>
-          <input id="billCustPhone" type="tel" placeholder="10-digit number" class="w-full mt-1 px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-neutral-900 outline-none" />
+          <label class="text-xs font-semibold text-slate-600">Mobile No. (WhatsApp)</label>
+          <input id="billCustPhone" oninput="saveCurrentDraft()" type="tel" placeholder="10-digit number" class="w-full mt-1 px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-neutral-900" />
         </div>
         <div>
           <label class="text-xs font-semibold text-slate-600">Bill Date</label>
-          <input id="billDate" type="date" class="w-full mt-1 px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-neutral-900 outline-none" />
+          <input id="billDate" onchange="saveCurrentDraft()" type="date" class="w-full mt-1 px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-neutral-900" />
         </div>
       </div>
 
-      <!-- Item Form -->
+      <!-- Add Item Box -->
       <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-3">
         <div class="flex justify-between items-center">
           <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Item Details</h2>
-          <select id="billItemType" onchange="toggleCalcFields('bill')" class="text-xs border rounded p-1">
+          <select id="billItemType" onchange="toggleCalcFields('bill')" class="text-xs border rounded p-1 bg-white">
             <option value="plywood">Plywood (Sq.Ft Formula)</option>
             <option value="general">Hardware / Adhesive (Direct Qty)</option>
           </select>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <input id="billItemName" type="text" placeholder="Item Name (e.g. 19mm Marine Ply / Fevicol 5kg)" class="px-3 py-2 border rounded-lg text-sm" />
+          <input id="billItemName" type="text" placeholder="Item Name (e.g. 19mm Gurjan Ply / Fevicol 5kg)" class="px-3 py-2 border rounded-lg text-sm" />
           <div id="billPlyFields" class="grid grid-cols-4 gap-2">
-            <input id="billLen" type="number" step="0.5" value="8" placeholder="L (ft)" class="p-1.5 border rounded text-xs text-center" title="Length" />
-            <input id="billWid" type="number" step="0.5" value="4" placeholder="W (ft)" class="p-1.5 border rounded text-xs text-center" title="Width" />
-            <input id="billQty" type="number" value="1" placeholder="Sheets" class="p-1.5 border rounded text-xs text-center" title="Sheets" />
+            <input id="billLen" type="number" step="0.5" value="8" placeholder="L (ft)" class="p-1.5 border rounded text-xs text-center" title="Length in ft" />
+            <input id="billWid" type="number" step="0.5" value="4" placeholder="W (ft)" class="p-1.5 border rounded text-xs text-center" title="Width in ft" />
+            <input id="billQty" type="number" value="1" placeholder="Sheets" class="p-1.5 border rounded text-xs text-center" title="Quantity / Sheets" />
             <input id="billRate" type="number" step="0.5" placeholder="Rate/sqft" class="p-1.5 border rounded text-xs font-bold text-center" />
           </div>
           <div id="billGenFields" class="grid grid-cols-2 gap-2 hidden">
@@ -80,60 +81,92 @@
           </div>
         </div>
 
-        <div class="flex justify-end">
-          <button onclick="addBillItem()" class="bg-neutral-900 hover:bg-black text-white px-4 py-2 rounded-lg text-xs font-medium">+ Add Item</button>
+        <div class="flex justify-between items-center pt-2">
+          <span class="text-xs text-emerald-600 font-semibold" id="autoSaveIndicator">● Auto-Save Active</span>
+          <button onclick="addBillItem()" class="bg-neutral-900 hover:bg-black text-white px-5 py-2 rounded-lg text-xs font-medium transition">+ Add Item</button>
         </div>
       </div>
 
-      <!-- Current Items Table -->
+      <!-- Items Table -->
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
         <table class="w-full text-left text-xs">
           <thead class="bg-slate-50 uppercase text-slate-500 border-b">
             <tr>
+              <th class="p-3">#</th>
               <th class="p-3">Description</th>
-              <th class="p-3">Details</th>
-              <th class="p-3 text-right">Sq.Ft</th>
+              <th class="p-3 text-right">Sq.Ft / Qty</th>
               <th class="p-3 text-right">Rate</th>
-              <th class="p-3 text-right">Total</th>
+              <th class="p-3 text-right">Total (₹)</th>
               <th class="p-3 text-center">Action</th>
             </tr>
           </thead>
-          <tbody id="billItemsBody" class="divide-y divide-slate-100">
-            <tr><td colspan="6" class="text-center p-4 text-slate-400">No items added</td></tr>
+          <tbody id="billItemsBody" class="divide-y divide-slate-100 font-mono">
+            <tr><td colspan="6" class="text-center p-4 text-slate-400 font-sans">No items added yet.</td></tr>
           </tbody>
         </table>
       </div>
     </section>
 
-    <!-- Right Side Totals -->
+    <!-- Bill Totals & Actions -->
     <section class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-4 h-fit">
-      <h3 class="font-bold text-sm border-b pb-2">Bill Summary</h3>
-      <div class="flex justify-between text-sm"><span>Subtotal:</span><span id="billSubtotal" class="font-bold">₹0.00</span></div>
-      <div class="flex justify-between text-sm items-center">
-        <span>GST:</span>
-        <select id="billGstRate" onchange="renderBillTotals()" class="border rounded p-1 text-xs">
-          <option value="0">0%</option>
-          <option value="18" selected>18%</option>
-          <option value="28">28%</option>
-        </select>
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 class="font-bold text-sm">Invoice Summary</h3>
+        <span id="displayInvNo" class="text-xs font-mono font-bold text-neutral-500"></span>
       </div>
-      <div class="flex justify-between text-sm"><span>GST Amount:</span><span id="billGstAmt">₹0.00</span></div>
-      <div class="flex justify-between text-base font-black border-t pt-2 text-neutral-900">
-        <span>Grand Total:</span><span id="billGrandTotal">₹0.00</span>
+
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between"><span>Subtotal:</span><span id="billSubtotal" class="font-bold">₹0.00</span></div>
+        <div class="flex justify-between items-center">
+          <span>GST Rate:</span>
+          <select id="billGstRate" onchange="renderBillTotals(); saveCurrentDraft();" class="border rounded p-1 text-xs bg-white">
+            <option value="0">0% (B2C / Rough)</option>
+            <option value="18" selected>18% GST</option>
+            <option value="28">28% GST</option>
+          </select>
+        </div>
+        <div class="flex justify-between"><span>GST Amount:</span><span id="billGstAmt">₹0.00</span></div>
+        <div class="flex justify-between items-center">
+          <span>Discount (₹):</span>
+          <input id="billDiscount" oninput="renderBillTotals(); saveCurrentDraft();" type="number" value="0" class="w-20 border rounded px-2 py-0.5 text-right text-xs" />
+        </div>
+        <div class="flex justify-between text-base font-black border-t pt-2 text-neutral-900">
+          <span>Grand Total:</span><span id="billGrandTotal">₹0.00</span>
+        </div>
       </div>
-      <button onclick="printCurrentBill()" class="w-full bg-neutral-900 hover:bg-black text-white py-2 rounded-lg text-sm font-semibold transition">🖨️ Print Invoice</button>
+
+      <div class="space-y-2 pt-2 border-t text-xs">
+        <div>
+          <label class="font-semibold text-slate-600">Payment Status</label>
+          <select id="billPayStatus" class="w-full mt-1 border rounded p-1.5 bg-white">
+            <option value="Paid">Full Paid</option>
+            <option value="Credit">Udhaar (Khata)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="space-y-2 pt-3">
+        <button onclick="saveAndPrintBill()" class="w-full bg-neutral-900 hover:bg-black text-white py-2.5 rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2">
+          🖨️ Save & Print Bill
+        </button>
+        <button onclick="shareBillWhatsApp()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-2">
+          💬 Send on WhatsApp
+        </button>
+        <button onclick="resetBillCounter(true)" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-1.5 rounded-lg text-xs font-medium transition">
+          + Start Blank Bill
+        </button>
+      </div>
     </section>
   </main>
 
-  <!-- TAB 2: KHATA / CREDIT LEDGER (Multi-Date Delivery) -->
+  <!-- TAB 2: CUSTOMER KHATA (UDHAAR & MAAL WAPIS) -->
   <main id="ledgerView" class="max-w-6xl mx-auto p-3 sm:p-6 w-full space-y-6 hidden no-print">
     
-    <!-- Customer Select & Balances -->
+    <!-- Customer Selection -->
     <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
       <div>
         <label class="text-xs font-semibold text-slate-600">Select Customer / Contractor</label>
         <select id="selectedLedgerCustomer" onchange="loadCustomerLedger()" class="w-full mt-1 p-2 border rounded-lg text-sm bg-white font-medium">
-          <!-- Dynamic Customers List -->
+          <!-- Populated dynamically -->
         </select>
       </div>
       <div>
@@ -141,76 +174,77 @@
       </div>
       <div class="bg-amber-50 p-3 rounded-lg border border-amber-200 text-right">
         <p class="text-xs text-amber-800 font-semibold">Total Outstanding Balance (Udhaar)</p>
-        <p id="ledgerTotalBalance" class="text-xl font-black text-amber-900">₹0.00</p>
+        <p id="ledgerTotalBalance" class="text-xl font-black text-amber-900 font-mono">₹0.00</p>
       </div>
     </div>
 
-    <!-- Multi-Date Entry Form -->
+    <!-- Multi-Date Entry Form (Delivery, Payment & Return) -->
     <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-3">
       <div class="flex justify-between items-center border-b pb-2">
-        <h3 id="formModeHeader" class="text-sm font-bold text-slate-800 uppercase tracking-wide">Add Entry (Delivery or Payment)</h3>
-        <span class="text-xs text-slate-500">Alag-alag dates pe gaya maal ya aayi payment yahan darj karein</span>
+        <h3 id="formModeHeader" class="text-sm font-bold text-slate-800 uppercase tracking-wide">Add Entry (Delivery / Return / Payment)</h3>
+        <span class="text-xs text-slate-400">Date-wise hisaab auto-save hota hai</span>
       </div>
 
       <input type="hidden" id="editEntryId" value="" />
 
       <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
         <div>
-          <label class="text-xs font-medium text-slate-600">Entry Date</label>
+          <label class="text-xs font-medium text-slate-600">Date</label>
           <input id="ledgerDate" type="date" class="w-full mt-1 p-2 border rounded-lg text-xs font-medium" />
         </div>
         <div>
-          <label class="text-xs font-medium text-slate-600">Entry Type</label>
-          <select id="ledgerEntryType" onchange="toggleLedgerEntryKind()" class="w-full mt-1 p-2 border rounded-lg text-xs bg-white">
-            <option value="goods">Goods Supplied (Maal Delivery)</option>
-            <option value="payment">Payment Received (Jama)</option>
+          <label class="text-xs font-semibold text-slate-700">Transaction Type</label>
+          <select id="ledgerEntryType" onchange="toggleLedgerEntryKind()" class="w-full mt-1 p-2 border rounded-lg text-xs bg-white font-bold">
+            <option value="goods" class="text-slate-800">1. Maal Delivery (Goods Given)</option>
+            <option value="return" class="text-amber-700">2. Maal Wapis (Sales Return)</option>
+            <option value="payment" class="text-emerald-700">3. Payment Received (Jama)</option>
           </select>
         </div>
         <div class="sm:col-span-2">
-          <label class="text-xs font-medium text-slate-600">Description / Item Note</label>
-          <input id="ledgerDesc" type="text" placeholder="e.g. 5 sheets 18mm sent via Auto / Received Cash" class="w-full mt-1 p-2 border rounded-lg text-xs" />
+          <label class="text-xs font-medium text-slate-600">Item Name / Note</label>
+          <input id="ledgerDesc" type="text" placeholder="e.g. 2 sheets 18mm returned / Cash Jama" class="w-full mt-1 p-2 border rounded-lg text-xs" />
         </div>
       </div>
 
-      <!-- Dimensional Calculation for Goods -->
+      <!-- Dimensional Calculation Box -->
       <div id="ledgerGoodsCalcBox" class="p-3 bg-neutral-50 rounded-lg border border-neutral-200 grid grid-cols-2 sm:grid-cols-5 gap-2">
         <div>
           <label class="text-[11px] text-slate-500">Length (ft)</label>
-          <input id="ledLen" type="number" step="0.5" value="8" oninput="calcLedgerRow()" class="w-full p-1.5 border rounded text-xs" />
+          <input id="ledLen" type="number" step="0.5" value="8" oninput="calcLedgerRow()" class="w-full p-1.5 border rounded text-xs bg-white" />
         </div>
         <div>
           <label class="text-[11px] text-slate-500">Width (ft)</label>
-          <input id="ledWid" type="number" step="0.5" value="4" oninput="calcLedgerRow()" class="w-full p-1.5 border rounded text-xs" />
+          <input id="ledWid" type="number" step="0.5" value="4" oninput="calcLedgerRow()" class="w-full p-1.5 border rounded text-xs bg-white" />
         </div>
         <div>
           <label class="text-[11px] text-slate-500">Qty (Sheets/Pcs)</label>
-          <input id="ledQty" type="number" value="1" oninput="calcLedgerRow()" class="w-full p-1.5 border rounded text-xs" />
+          <input id="ledQty" type="number" value="1" oninput="calcLedgerRow()" class="w-full p-1.5 border rounded text-xs bg-white" />
         </div>
         <div>
           <label class="text-[11px] text-slate-500">Rate / Unit (₹)</label>
-          <input id="ledRate" type="number" step="0.5" placeholder="Rate" oninput="calcLedgerRow()" class="w-full p-1.5 border rounded text-xs font-bold" />
+          <input id="ledRate" type="number" step="0.5" placeholder="Rate" oninput="calcLedgerRow()" class="w-full p-1.5 border rounded text-xs font-bold bg-white" />
         </div>
         <div>
-          <label class="text-[11px] text-slate-500">Total Amount (₹)</label>
+          <label class="text-[11px] text-slate-500">Amount (₹)</label>
           <input id="ledTotalAmt" type="number" step="0.5" class="w-full p-1.5 border rounded text-xs font-black bg-white" />
         </div>
       </div>
 
       <div class="flex justify-between items-center pt-2">
         <button id="cancelEditBtn" onclick="resetLedgerForm()" class="text-xs text-slate-500 hover:text-slate-800 underline hidden">Cancel Edit</button>
-        <button onclick="saveLedgerEntry()" id="saveEntryBtn" class="bg-neutral-900 hover:bg-black text-white px-5 py-2 rounded-lg text-xs font-semibold ml-auto">
-          Save Entry to Ledger
+        <button onclick="saveLedgerEntry()" id="saveEntryBtn" class="bg-neutral-900 hover:bg-black text-white px-5 py-2 rounded-lg text-xs font-semibold ml-auto transition">
+          💾 Save Entry to Khata
         </button>
       </div>
     </div>
 
-    <!-- Ledger Transaction History (With Edit & Delete) -->
+    <!-- Ledger Statement Table -->
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
       <div class="p-3 border-b flex justify-between items-center bg-slate-50">
         <h4 class="font-bold text-xs text-slate-700 uppercase tracking-wide">Customer Account Statement</h4>
         <div class="space-x-2">
-          <button onclick="printCustomerLedger()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-1 rounded text-xs font-medium">🖨️ Print Statement</button>
-          <button onclick="shareLedgerWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded text-xs font-medium">💬 WhatsApp Statement</button>
+          <button onclick="printCustomerLedger()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 px-3 py-1 rounded text-xs font-medium transition">🖨️ Print Statement</button>
+          <button onclick="shareLedgerWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded text-xs font-medium transition">💬 WhatsApp Statement</button>
         </div>
       </div>
       <div class="overflow-x-auto">
@@ -218,23 +252,53 @@
           <thead class="bg-slate-100 text-slate-600 uppercase border-b">
             <tr>
               <th class="p-3">Date</th>
-              <th class="p-3">Description & Goods Details</th>
-              <th class="p-3 text-right">Debit (Maal Gaya ₹)</th>
-              <th class="p-3 text-right">Credit (Jama Aaya ₹)</th>
-              <th class="p-3 text-right">Balance Due</th>
+              <th class="p-3">Type</th>
+              <th class="p-3">Description / Details</th>
+              <th class="p-3 text-right">Maal Gaya (+)</th>
+              <th class="p-3 text-right">Maal Wapis (-)</th>
+              <th class="p-3 text-right">Jama / Cash (-)</th>
+              <th class="p-3 text-right">Remaining Balance</th>
               <th class="p-3 text-center">Actions</th>
             </tr>
           </thead>
           <tbody id="ledgerTableBody" class="divide-y divide-slate-100 font-mono">
-            <!-- Dynamic Ledger Rows -->
+            <!-- Dynamic Rows -->
           </tbody>
         </table>
       </div>
     </div>
   </main>
 
-  <!-- PRINTABLE STATEMENT & INVOICE -->
-  <div id="printArea" class="hidden p-6 max-w-3xl mx-auto bg-white">
+  <!-- TAB 3: BILL HISTORY -->
+  <main id="historyView" class="max-w-6xl mx-auto p-3 sm:p-6 w-full hidden no-print">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-4">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="font-bold text-sm text-slate-800 uppercase">Saved Bills History</h3>
+        <button onclick="loadBillHistory()" class="text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded font-medium">🔄 Refresh</button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-50 uppercase text-slate-500 border-b">
+            <tr>
+              <th class="p-3">Bill No</th>
+              <th class="p-3">Date</th>
+              <th class="p-3">Customer</th>
+              <th class="p-3">Items</th>
+              <th class="p-3 text-right">Amount (₹)</th>
+              <th class="p-3">Status</th>
+              <th class="p-3 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody id="billHistoryBody" class="divide-y divide-slate-100 font-mono">
+            <!-- Injected dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- PRINTABLE TEMPLATE -->
+  <div id="printArea" class="hidden max-w-3xl mx-auto bg-white">
     <div class="border-b-2 border-neutral-900 pb-3 flex items-center justify-between">
       <div class="flex items-center space-x-3">
         <img id="printLogo" src="" class="h-20 w-20 object-contain hidden" alt="SPW Logo" />
@@ -245,7 +309,7 @@
         </div>
       </div>
       <div class="text-right">
-        <span id="printDocType" class="text-xs font-bold uppercase border border-black px-2 py-1">Statement</span>
+        <span id="printDocType" class="text-xs font-bold uppercase border border-black px-2 py-1">INVOICE</span>
       </div>
     </div>
 
@@ -255,39 +319,40 @@
         <p><strong>Phone:</strong> <span id="pPhone"></span></p>
       </div>
       <div class="text-right">
+        <p><strong>Ref / Bill No:</strong> <span id="pRefNo"></span></p>
         <p><strong>Date:</strong> <span id="pDate"></span></p>
       </div>
     </div>
 
     <table class="w-full text-left text-xs my-4 border-collapse">
-      <thead id="pTableHead" class="border-b border-black"></thead>
-      <tbody id="pTableBody" class="divide-y divide-neutral-200"></tbody>
+      <thead id="pTableHead" class="border-b border-black uppercase"></thead>
+      <tbody id="pTableBody" class="divide-y divide-neutral-200 font-mono"></tbody>
     </table>
 
-    <div class="border-t pt-3 flex justify-between text-xs font-bold">
-      <div class="text-neutral-500 font-normal">Thank you for choosing Siya Ply World!</div>
-      <div id="pTotalsBlock" class="text-right space-y-1"></div>
+    <div class="border-t pt-3 flex justify-between text-xs">
+      <div class="text-neutral-500">Thank you for choosing Siya Ply World!</div>
+      <div id="pTotalsBlock" class="text-right space-y-1 font-bold"></div>
     </div>
   </div>
 
   <script>
-    // IndexedDB Database Setup for Permanent Offline-First Storage
+    // IndexedDB Setup
     let db;
-    const request = indexedDB.open("SiyaPlyWorldDB", 1);
-    request.onupgradeneeded = function(e) {
+    const req = indexedDB.open("SiyaPlyWorldDB_V2", 1);
+    req.onupgradeneeded = function(e) {
       db = e.target.result;
       if (!db.objectStoreNames.contains("customers")) db.createObjectStore("customers", { keyPath: "id", autoIncrement: true });
       if (!db.objectStoreNames.contains("ledger")) db.createObjectStore("ledger", { keyPath: "id", autoIncrement: true });
+      if (!db.objectStoreNames.contains("invoices")) db.createObjectStore("invoices", { keyPath: "id", autoIncrement: true });
     };
-    request.onsuccess = function(e) {
+    req.onsuccess = function(e) {
       db = e.target.result;
-      initDefaultCustomers();
+      initDefaults();
       loadLogo();
-      document.getElementById('billDate').value = new Date().toISOString().split('T')[0];
-      document.getElementById('ledgerDate').value = new Date().toISOString().split('T')[0];
+      loadSavedDraft();
     };
 
-    function initDefaultCustomers() {
+    function initDefaults() {
       const tx = db.transaction("customers", "readwrite");
       const store = tx.objectStore("customers");
       const countReq = store.count();
@@ -298,25 +363,40 @@
         }
         refreshCustomerDropdown();
       };
+      document.getElementById('billDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('ledgerDate').value = new Date().toISOString().split('T')[0];
+      setNewInvoiceNumber();
+    }
+
+    function setNewInvoiceNumber() {
+      let counter = localStorage.getItem('spw_inv_num') || 1001;
+      document.getElementById('displayInvNo').innerText = `Bill #SPW-${counter}`;
     }
 
     // Tab Navigation
     function switchTab(tab) {
+      document.getElementById('billingView').classList.add('hidden');
+      document.getElementById('ledgerView').classList.add('hidden');
+      document.getElementById('historyView').classList.add('hidden');
+      document.getElementById('tabBillingBtn').className = "bg-neutral-800 px-3 py-1.5 rounded-lg text-xs font-medium text-white transition";
+      document.getElementById('tabLedgerBtn').className = "bg-neutral-800 px-3 py-1.5 rounded-lg text-xs font-medium text-white transition";
+      document.getElementById('tabHistBtn').className = "bg-neutral-800 px-3 py-1.5 rounded-lg text-xs font-medium text-white transition";
+
       if (tab === 'billing') {
         document.getElementById('billingView').classList.remove('hidden');
-        document.getElementById('ledgerView').classList.add('hidden');
         document.getElementById('tabBillingBtn').className = "bg-amber-600 px-3 py-1.5 rounded-lg text-xs font-medium text-white transition";
-        document.getElementById('tabLedgerBtn').className = "bg-neutral-800 px-3 py-1.5 rounded-lg text-xs font-medium text-white transition";
-      } else {
-        document.getElementById('billingView').classList.add('hidden');
+      } else if (tab === 'ledger') {
         document.getElementById('ledgerView').classList.remove('hidden');
         document.getElementById('tabLedgerBtn').className = "bg-amber-600 px-3 py-1.5 rounded-lg text-xs font-medium text-white transition";
-        document.getElementById('tabBillingBtn').className = "bg-neutral-800 px-3 py-1.5 rounded-lg text-xs font-medium text-white transition";
         loadCustomerLedger();
+      } else {
+        document.getElementById('historyView').classList.remove('hidden');
+        document.getElementById('tabHistBtn').className = "bg-amber-600 px-3 py-1.5 rounded-lg text-xs font-medium text-white transition";
+        loadBillHistory();
       }
     }
 
-    // Logo Management
+    // Logo Upload
     function uploadLogo(e) {
       const file = e.target.files[0];
       if (file) {
@@ -331,9 +411,8 @@
     function loadLogo() {
       const data = localStorage.getItem('spw_logo');
       if (data) {
-        const navImg = document.getElementById('navLogo');
-        navImg.src = data;
-        navImg.classList.remove('hidden');
+        document.getElementById('navLogo').src = data;
+        document.getElementById('navLogo').classList.remove('hidden');
         document.getElementById('navLogoText').classList.add('hidden');
         document.getElementById('printLogo').src = data;
         document.getElementById('printLogo').classList.remove('hidden');
@@ -342,107 +421,217 @@
 
     // Toggle Calculation Fields
     function toggleCalcFields(prefix) {
-      const type = document.getElementById(prefix === 'bill' ? 'billItemType' : 'ledgerEntryType').value;
-      if (prefix === 'bill') {
-        if (type === 'plywood') {
-          document.getElementById('billPlyFields').classList.remove('hidden');
-          document.getElementById('billGenFields').classList.add('hidden');
-        } else {
-          document.getElementById('billPlyFields').classList.add('hidden');
-          document.getElementById('billGenFields').classList.remove('hidden');
-        }
+      const type = document.getElementById('billItemType').value;
+      if (type === 'plywood') {
+        document.getElementById('billPlyFields').classList.remove('hidden');
+        document.getElementById('billGenFields').classList.add('hidden');
+      } else {
+        document.getElementById('billPlyFields').classList.add('hidden');
+        document.getElementById('billGenFields').classList.remove('hidden');
       }
     }
 
-    // TAB 1: Instant Bill Logics
+    // TAB 1: Auto-Saving Billing Engine
     let currentBillItems = [];
+
     function addBillItem() {
       const name = document.getElementById('billItemName').value.trim();
       const type = document.getElementById('billItemType').value;
-      if (!name) return alert('Enter item name');
+      if (!name) return alert('Item ka naam enter karein');
 
-      let amount = 0, sqft = 0, desc = name;
+      let amount = 0, sqft = 0, detail = '';
+      let rate = 0;
+
       if (type === 'plywood') {
         const l = parseFloat(document.getElementById('billLen').value) || 0;
         const w = parseFloat(document.getElementById('billWid').value) || 0;
         const q = parseFloat(document.getElementById('billQty').value) || 0;
-        const r = parseFloat(document.getElementById('billRate').value) || 0;
+        rate = parseFloat(document.getElementById('billRate').value) || 0;
         sqft = l * w * q;
-        amount = sqft * r;
-        desc += ` (${l}x${w}ft - ${q}sh)`;
+        amount = sqft * rate;
+        detail = `${l}×${w} ft (${q} sh)`;
       } else {
         const q = parseFloat(document.getElementById('billGenQty').value) || 0;
-        const r = parseFloat(document.getElementById('billGenRate').value) || 0;
-        amount = q * r;
-        desc += ` (${q} units)`;
+        rate = parseFloat(document.getElementById('billGenRate').value) || 0;
+        amount = q * rate;
+        detail = `${q} units`;
       }
 
-      currentBillItems.push({ desc, sqft, amount });
-      renderBillItems();
+      currentBillItems.push({ name, detail, sqft, rate, amount });
+      renderBillTable();
+      saveCurrentDraft();
+
       document.getElementById('billItemName').value = '';
     }
 
-    function renderBillItems() {
+    function renderBillTable() {
       const tbody = document.getElementById('billItemsBody');
       if (currentBillItems.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center p-4 text-slate-400">No items</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center p-4 text-slate-400 font-sans">No items added yet.</td></tr>';
       } else {
         tbody.innerHTML = currentBillItems.map((item, idx) => `
-          <tr>
-            <td class="p-3 font-semibold">${item.desc}</td>
-            <td class="p-3">-</td>
-            <td class="p-3 text-right font-mono">${item.sqft ? item.sqft.toFixed(2) : '-'}</td>
-            <td class="p-3 text-right font-mono">-</td>
-            <td class="p-3 text-right font-bold font-mono">₹${item.amount.toFixed(2)}</td>
-            <td class="p-3 text-center"><button onclick="currentBillItems.splice(${idx},1);renderBillItems();" class="text-red-500 font-bold">X</button></td>
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-3 text-slate-400 font-sans">${idx + 1}</td>
+            <td class="p-3 font-sans font-medium text-slate-800">${item.name}</td>
+            <td class="p-3 text-right">${item.sqft ? item.sqft.toFixed(2) + ' sqft' : item.detail}</td>
+            <td class="p-3 text-right">₹${item.rate}</td>
+            <td class="p-3 text-right font-bold">₹${item.amount.toFixed(2)}</td>
+            <td class="p-3 text-center"><button onclick="removeItem(${idx})" class="text-red-500 font-bold px-2 py-1 font-sans">Delete</button></td>
           </tr>
         `).join('');
       }
       renderBillTotals();
     }
 
+    function removeItem(idx) {
+      currentBillItems.splice(idx, 1);
+      renderBillTable();
+      saveCurrentDraft();
+    }
+
     function renderBillTotals() {
       const subtotal = currentBillItems.reduce((acc, i) => acc + i.amount, 0);
       const gstRate = parseFloat(document.getElementById('billGstRate').value) || 0;
+      const discount = parseFloat(document.getElementById('billDiscount').value) || 0;
+
       const gst = (subtotal * gstRate) / 100;
-      const grand = subtotal + gst;
+      const grand = Math.max(0, subtotal + gst - discount);
+
       document.getElementById('billSubtotal').innerText = `₹${subtotal.toFixed(2)}`;
       document.getElementById('billGstAmt').innerText = `₹${gst.toFixed(2)}`;
-      document.getElementById('billGrandTotal').innerText = `₹${grand.toFixed(2)}`;
+      document.getElementById('billGrandTotal').innerText = `₹${Math.round(grand).toFixed(2)}`;
     }
 
-    function printCurrentBill() {
-      if (currentBillItems.length === 0) return alert('Bill empty');
-      document.getElementById('printDocType').innerText = "Cash Invoice";
-      document.getElementById('pName').innerText = document.getElementById('billCustName').value || "Cash Customer";
-      document.getElementById('pPhone').innerText = document.getElementById('billCustPhone').value || "N/A";
-      document.getElementById('pDate').innerText = document.getElementById('billDate').value;
-
-      document.getElementById('pTableHead').innerHTML = `
-        <tr class="uppercase">
-          <th class="py-2">Item Description</th>
-          <th class="py-2 text-right">Sq.Ft</th>
-          <th class="py-2 text-right">Amount (₹)</th>
-        </tr>
-      `;
-      document.getElementById('pTableBody').innerHTML = currentBillItems.map(i => `
-        <tr>
-          <td class="py-2 font-medium">${i.desc}</td>
-          <td class="py-2 text-right font-mono">${i.sqft ? i.sqft.toFixed(2) : '-'}</td>
-          <td class="py-2 text-right font-bold font-mono">₹${i.amount.toFixed(2)}</td>
-        </tr>
-      `).join('');
-
-      document.getElementById('pTotalsBlock').innerHTML = `
-        <p>Grand Total: <span class="font-black text-sm">${document.getElementById('billGrandTotal').innerText}</span></p>
-      `;
-
-      document.getElementById('printArea').classList.remove('hidden');
-      window.print();
-      document.getElementById('printArea').classList.add('hidden');
+    // Auto-Save Draft to LocalStorage so data never vanishes
+    function saveCurrentDraft() {
+      const draft = {
+        name: document.getElementById('billCustName').value,
+        phone: document.getElementById('billCustPhone').value,
+        date: document.getElementById('billDate').value,
+        gstRate: document.getElementById('billGstRate').value,
+        discount: document.getElementById('billDiscount').value,
+        items: currentBillItems
+      };
+      localStorage.setItem('spw_active_draft', JSON.stringify(draft));
     }
 
-    // TAB 2: Multi-Date Ledger System (Khata)
+    function loadSavedDraft() {
+      const raw = localStorage.getItem('spw_active_draft');
+      if (raw) {
+        const draft = JSON.parse(raw);
+        document.getElementById('billCustName').value = draft.name || '';
+        document.getElementById('billCustPhone').value = draft.phone || '';
+        if (draft.date) document.getElementById('billDate').value = draft.date;
+        document.getElementById('billGstRate').value = draft.gstRate || 0;
+        document.getElementById('billDiscount').value = draft.discount || 0;
+        currentBillItems = draft.items || [];
+        renderBillTable();
+      }
+    }
+
+    function resetBillCounter(ask) {
+      if (ask && !confirm('Blank naya bill shuru karein?')) return;
+      currentBillItems = [];
+      document.getElementById('billCustName').value = '';
+      document.getElementById('billCustPhone').value = '';
+      document.getElementById('billDiscount').value = '0';
+      localStorage.removeItem('spw_active_draft');
+      renderBillTable();
+    }
+
+    // Save permanently to IndexedDB and trigger Print
+    function saveAndPrintBill() {
+      if (currentBillItems.length === 0) return alert('Bill me items add karein!');
+
+      let counter = parseInt(localStorage.getItem('spw_inv_num') || 1001);
+      const invNo = `SPW-${counter}`;
+      const grandTotal = document.getElementById('billGrandTotal').innerText;
+
+      const invoiceData = {
+        invNo: invNo,
+        date: document.getElementById('billDate').value,
+        custName: document.getElementById('billCustName').value.trim() || 'Cash Customer',
+        phone: document.getElementById('billCustPhone').value.trim(),
+        items: [...currentBillItems],
+        subtotal: document.getElementById('billSubtotal').innerText,
+        gst: document.getElementById('billGstAmt').innerText,
+        discount: document.getElementById('billDiscount').value,
+        grandTotal: grandTotal,
+        payStatus: document.getElementById('billPayStatus').value
+      };
+
+      // Permanent Save in DB
+      const tx = db.transaction("invoices", "readwrite");
+      tx.objectStore("invoices").add(invoiceData);
+      tx.oncomplete = function() {
+        // Increment Counter
+        localStorage.setItem('spw_inv_num', counter + 1);
+        setNewInvoiceNumber();
+
+        // Print Flow
+        document.getElementById('printDocType').innerText = "TAX INVOICE";
+        document.getElementById('pRefNo').innerText = invoiceData.invNo;
+        document.getElementById('pName').innerText = invoiceData.custName;
+        document.getElementById('pPhone').innerText = invoiceData.phone || 'N/A';
+        document.getElementById('pDate').innerText = invoiceData.date;
+
+        document.getElementById('pTableHead').innerHTML = `
+          <tr>
+            <th class="py-2">Item Description</th>
+            <th class="py-2">Size / Detail</th>
+            <th class="py-2 text-right">Sq.Ft / Qty</th>
+            <th class="py-2 text-right">Rate</th>
+            <th class="py-2 text-right">Amount</th>
+          </tr>
+        `;
+
+        document.getElementById('pTableBody').innerHTML = invoiceData.items.map(i => `
+          <tr>
+            <td class="py-2 font-sans font-medium">${i.name}</td>
+            <td class="py-2 text-slate-600 font-sans">${i.detail}</td>
+            <td class="py-2 text-right font-mono">${i.sqft ? i.sqft.toFixed(2) : '-'}</td>
+            <td class="py-2 text-right font-mono">₹${i.rate}</td>
+            <td class="py-2 text-right font-bold font-mono">₹${i.amount.toFixed(2)}</td>
+          </tr>
+        `).join('');
+
+        document.getElementById('pTotalsBlock').innerHTML = `
+          <p>Subtotal: ${invoiceData.subtotal}</p>
+          <p>GST: ${invoiceData.gst}</p>
+          <p>Discount: ₹${invoiceData.discount}</p>
+          <p class="text-sm font-black border-t pt-1">Grand Total: ${invoiceData.grandTotal}</p>
+          <p class="text-[10px] text-slate-500 uppercase">Status: ${invoiceData.payStatus}</p>
+        `;
+
+        document.getElementById('printArea').classList.remove('hidden');
+        window.print();
+        document.getElementById('printArea').classList.add('hidden');
+
+        resetBillCounter(false);
+      };
+    }
+
+    function shareBillWhatsApp() {
+      if (currentBillItems.length === 0) return alert('Bill me koi item nahi hai');
+      const phone = document.getElementById('billCustPhone').value.trim();
+      const name = document.getElementById('billCustName').value.trim() || "Customer";
+      const total = document.getElementById('billGrandTotal').innerText;
+
+      let itemLines = currentBillItems.map((i, idx) => `${idx + 1}. ${i.name} (${i.detail}) - ₹${i.amount.toFixed(0)}`).join('%0A');
+
+      const msg = `*SIYA PLY WORLD - INVOICE*%0A` +
+        `Customer: ${name}%0A` +
+        `Date: ${document.getElementById('billDate').value}%0A` +
+        `---------------------------%0A` +
+        itemLines + `%0A` +
+        `---------------------------%0A` +
+        `*Grand Total: ${total}*%0A` +
+        `Shukriya!`;
+
+      window.open(`https://wa.me/${phone ? '91' + phone : ''}?text=${msg}`, '_blank');
+    }
+
+    // TAB 2: KHATA (DELIVERY, PAYMENT & MAAL WAPIS)
     function promptNewCustomer() {
       const name = prompt("Customer / Contractor Name:");
       if (!name) return;
@@ -454,11 +643,9 @@
 
     function refreshCustomerDropdown() {
       const tx = db.transaction("customers", "readonly");
-      const store = tx.objectStore("customers");
-      const req = store.getAll();
-      req.onsuccess = function() {
+      tx.objectStore("customers").getAll().onsuccess = function(e) {
         const select = document.getElementById('selectedLedgerCustomer');
-        select.innerHTML = req.result.map(c => `<option value="${c.id}">${c.name} (${c.phone || 'No Phone'})</option>`).join('');
+        select.innerHTML = e.target.result.map(c => `<option value="${c.id}">${c.name} (${c.phone || 'No Phone'})</option>`).join('');
         loadCustomerLedger();
       };
     }
@@ -488,35 +675,42 @@
       const desc = document.getElementById('ledgerDesc').value.trim();
       const editId = document.getElementById('editEntryId').value;
 
-      let debit = 0, credit = 0, goodsDetail = '';
+      let debit = 0, credit = 0, returnAmt = 0, details = '';
 
       if (kind === 'goods') {
         const l = document.getElementById('ledLen').value;
         const w = document.getElementById('ledWid').value;
         const q = document.getElementById('ledQty').value;
         const r = document.getElementById('ledRate').value;
-        const amt = parseFloat(document.getElementById('ledTotalAmt').value) || 0;
-        debit = amt;
-        goodsDetail = `${desc} [${l}x${w}ft, ${q} pcs @ ₹${r}]`;
+        debit = parseFloat(document.getElementById('ledTotalAmt').value) || 0;
+        details = `${desc} [${l}×${w}ft, ${q} sheets @ ₹${r}]`;
+      } else if (kind === 'return') {
+        // MAAL WAPIS LOGIC (Sales Return)
+        const l = document.getElementById('ledLen').value;
+        const w = document.getElementById('ledWid').value;
+        const q = document.getElementById('ledQty').value;
+        const r = document.getElementById('ledRate').value;
+        returnAmt = parseFloat(document.getElementById('ledTotalAmt').value) || 0;
+        details = `WAPIS: ${desc} [${l}×${w}ft, ${q} sheets @ ₹${r}]`;
       } else {
-        credit = parseFloat(document.getElementById('ledTotalAmt').value) || parseFloat(prompt("Enter Payment Amount Received (₹):") || 0);
-        goodsDetail = desc || "Payment Received";
+        credit = parseFloat(document.getElementById('ledTotalAmt').value) || parseFloat(prompt("Received Payment Amount (₹):") || 0);
+        details = desc || "Payment Received";
       }
 
-      if (debit === 0 && credit === 0) return alert('Please enter an amount.');
+      if (debit === 0 && credit === 0 && returnAmt === 0) return alert('Valid amount enter karein');
 
       const entry = {
         customerId: custId,
         date: date,
         type: kind,
-        description: goodsDetail,
+        description: details,
         debit: debit,
-        credit: credit
+        credit: credit,
+        returnAmt: returnAmt
       };
 
       const tx = db.transaction("ledger", "readwrite");
       const store = tx.objectStore("ledger");
-
       if (editId) {
         entry.id = parseInt(editId);
         store.put(entry);
@@ -535,35 +729,41 @@
       if (!custId) return;
 
       const tx = db.transaction("ledger", "readonly");
-      const req = tx.objectStore("ledger").getAll();
-
-      req.onsuccess = function() {
-        // Filter and sort by Date Ascending
-        const entries = req.result
-          .filter(e => e.customerId === custId)
+      tx.objectStore("ledger").getAll().onsuccess = function(e) {
+        const entries = e.target.result
+          .filter(item => item.customerId === custId)
           .sort((a, b) => new Date(a.date) - new Date(b.date));
 
         let runningBalance = 0;
         const tbody = document.getElementById('ledgerTableBody');
 
         if (entries.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 font-sans">No deliveries or transactions recorded for this customer yet.</td></tr>`;
+          tbody.innerHTML = '<tr><td colspan="8" class="p-6 text-center text-slate-400 font-sans">No transactions recorded yet.</td></tr>';
           document.getElementById('ledgerTotalBalance').innerText = "₹0.00";
           return;
         }
 
-        tbody.innerHTML = entries.map(e => {
-          runningBalance += (e.debit - e.credit);
+        tbody.innerHTML = entries.map(item => {
+          // Balance Formula: Maal Gaya (+) - Maal Wapis (-) - Jama (-)
+          runningBalance += (item.debit - (item.credit || 0) - (item.returnAmt || 0));
+
+          let badge = '';
+          if (item.type === 'goods') badge = '<span class="bg-red-50 text-red-700 font-sans px-2 py-0.5 rounded text-[10px]">Maal Delivery</span>';
+          else if (item.type === 'return') badge = '<span class="bg-amber-100 text-amber-900 font-sans px-2 py-0.5 rounded text-[10px] font-bold">Maal Wapis</span>';
+          else badge = '<span class="bg-emerald-50 text-emerald-700 font-sans px-2 py-0.5 rounded text-[10px]">Payment</span>';
+
           return `
             <tr class="hover:bg-slate-50 transition">
-              <td class="p-3 whitespace-nowrap text-slate-600">${e.date}</td>
-              <td class="p-3 font-sans font-medium text-slate-800">${e.description}</td>
-              <td class="p-3 text-right font-bold text-red-600">${e.debit > 0 ? '₹' + e.debit.toFixed(2) : '-'}</td>
-              <td class="p-3 text-right font-bold text-emerald-600">${e.credit > 0 ? '₹' + e.credit.toFixed(2) : '-'}</td>
-              <td class="p-3 text-right font-bold text-slate-900 font-mono">₹${runningBalance.toFixed(2)}</td>
+              <td class="p-3 text-slate-500 whitespace-nowrap">${item.date}</td>
+              <td class="p-3">${badge}</td>
+              <td class="p-3 font-sans font-medium text-slate-800">${item.description}</td>
+              <td class="p-3 text-right font-bold text-red-600">${item.debit > 0 ? '₹' + item.debit.toFixed(2) : '-'}</td>
+              <td class="p-3 text-right font-bold text-amber-700">${item.returnAmt > 0 ? '₹' + item.returnAmt.toFixed(2) : '-'}</td>
+              <td class="p-3 text-right font-bold text-emerald-600">${item.credit > 0 ? '₹' + item.credit.toFixed(2) : '-'}</td>
+              <td class="p-3 text-right font-bold text-slate-900">₹${runningBalance.toFixed(2)}</td>
               <td class="p-3 text-center space-x-2 font-sans">
-                <button onclick="editLedgerEntry(${e.id})" class="text-xs text-blue-600 hover:underline">Edit</button>
-                <button onclick="deleteLedgerEntry(${e.id})" class="text-xs text-red-600 hover:underline">Delete</button>
+                <button onclick="editLedgerEntry(${item.id})" class="text-blue-600 hover:underline">Edit</button>
+                <button onclick="deleteLedgerEntry(${item.id})" class="text-red-600 hover:underline">Delete</button>
               </td>
             </tr>
           `;
@@ -581,10 +781,10 @@
         document.getElementById('ledgerDate').value = item.date;
         document.getElementById('ledgerEntryType').value = item.type;
         document.getElementById('ledgerDesc').value = item.description;
-        document.getElementById('ledTotalAmt').value = item.debit > 0 ? item.debit : item.credit;
+        document.getElementById('ledTotalAmt').value = item.debit || item.returnAmt || item.credit;
         toggleLedgerEntryKind();
 
-        document.getElementById('formModeHeader').innerText = "Edit Entry (Update Date/Amount)";
+        document.getElementById('formModeHeader').innerText = "Edit Entry (Date / Amount Change)";
         document.getElementById('saveEntryBtn').innerText = "Update Entry";
         document.getElementById('cancelEditBtn').classList.remove('hidden');
         window.scrollTo({ top: 150, behavior: 'smooth' });
@@ -592,7 +792,7 @@
     }
 
     function deleteLedgerEntry(id) {
-      if (confirm("Kya aap sach me ye entry delete karna chahte hain?")) {
+      if (confirm('Is entry ko delete karna chahte hain?')) {
         const tx = db.transaction("ledger", "readwrite");
         tx.objectStore("ledger").delete(id);
         tx.oncomplete = () => loadCustomerLedger();
@@ -603,14 +803,12 @@
       document.getElementById('editEntryId').value = '';
       document.getElementById('ledgerDesc').value = '';
       document.getElementById('ledTotalAmt').value = '';
-      document.getElementById('ledRate').value = '';
-      document.getElementById('formModeHeader').innerText = "Add Entry (Delivery or Payment)";
-      document.getElementById('saveEntryBtn').innerText = "Save Entry to Ledger";
+      document.getElementById('formModeHeader').innerText = "Add Entry (Delivery / Return / Payment)";
+      document.getElementById('saveEntryBtn').innerText = "💾 Save Entry to Khata";
       document.getElementById('cancelEditBtn').classList.add('hidden');
       toggleLedgerEntryKind();
     }
 
-    // Print & WhatsApp Statement
     function printCustomerLedger() {
       const custSelect = document.getElementById('selectedLedgerCustomer');
       const custName = custSelect.options[custSelect.selectedIndex].text;
@@ -619,38 +817,40 @@
       const tx = db.transaction("ledger", "readonly");
       tx.objectStore("ledger").getAll().onsuccess = function(ev) {
         const entries = ev.target.result.filter(e => e.customerId === custId).sort((a, b) => new Date(a.date) - new Date(b.date));
-        
+
         document.getElementById('printDocType').innerText = "Khata Statement";
         document.getElementById('pName').innerText = custName;
+        document.getElementById('pRefNo').innerText = "KHATA";
         document.getElementById('pPhone').innerText = "";
         document.getElementById('pDate').innerText = new Date().toLocaleDateString('en-IN');
 
         document.getElementById('pTableHead').innerHTML = `
           <tr>
             <th class="py-2">Date</th>
-            <th class="py-2">Details (Goods / Payment)</th>
-            <th class="py-2 text-right">Debit (₹)</th>
-            <th class="py-2 text-right">Credit (₹)</th>
-            <th class="py-2 text-right">Balance (₹)</th>
+            <th class="py-2">Particulars (Maal / Wapis / Jama)</th>
+            <th class="py-2 text-right">Debit (+)</th>
+            <th class="py-2 text-right">Credit (-)</th>
+            <th class="py-2 text-right">Balance</th>
           </tr>
         `;
 
         let bal = 0;
         document.getElementById('pTableBody').innerHTML = entries.map(e => {
-          bal += (e.debit - e.credit);
+          bal += (e.debit - (e.credit || 0) - (e.returnAmt || 0));
+          const deduction = (e.credit || 0) + (e.returnAmt || 0);
           return `
             <tr>
               <td class="py-2">${e.date}</td>
-              <td class="py-2">${e.description}</td>
-              <td class="py-2 text-right">${e.debit > 0 ? e.debit.toFixed(2) : '-'}</td>
-              <td class="py-2 text-right">${e.credit > 0 ? e.credit.toFixed(2) : '-'}</td>
-              <td class="py-2 text-right font-bold font-mono">₹${bal.toFixed(2)}</td>
+              <td class="py-2 font-sans">${e.description}</td>
+              <td class="py-2 text-right">${e.debit > 0 ? '₹' + e.debit.toFixed(2) : '-'}</td>
+              <td class="py-2 text-right">${deduction > 0 ? '₹' + deduction.toFixed(2) : '-'}</td>
+              <td class="py-2 text-right font-bold">₹${bal.toFixed(2)}</td>
             </tr>
           `;
         }).join('');
 
         document.getElementById('pTotalsBlock').innerHTML = `
-          <p class="text-sm">Total Due Balance: <span class="font-black text-red-600">₹${bal.toFixed(2)}</span></p>
+          <p class="text-sm">Total Outstanding Balance: <span class="text-red-600 font-mono font-black">₹${bal.toFixed(2)}</span></p>
         `;
 
         document.getElementById('printArea').classList.remove('hidden');
@@ -664,15 +864,87 @@
       const custName = custSelect.options[custSelect.selectedIndex].text;
       const bal = document.getElementById('ledgerTotalBalance').innerText;
 
-      const msg = `*SIYA PLY WORLD - ACCOUNT STATEMENT*%0A` +
+      const msg = `*SIYA PLY WORLD - KHATA STATEMENT*%0A` +
         `Customer: ${custName}%0A` +
         `Date: ${new Date().toLocaleDateString('en-IN')}%0A` +
         `--------------------------------%0A` +
-        `*Total Outstanding Balance: ${bal}*%0A` +
+        `*Total Baaki Balance: ${bal}*%0A` +
         `--------------------------------%0A` +
-        `Kripya balance clear karein. Shukriya!`;
+        `Kripya baaki payment clear karein. Shukriya!`;
 
       window.open(`https://wa.me/?text=${msg}`, '_blank');
+    }
+
+    // TAB 3: Bill History Logics
+    function loadBillHistory() {
+      const tx = db.transaction("invoices", "readonly");
+      tx.objectStore("invoices").getAll().onsuccess = function(e) {
+        const invoices = e.target.result.reverse();
+        const tbody = document.getElementById('billHistoryBody');
+
+        if (invoices.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-400 font-sans">Abhi tak koi bill save nahi hua.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = invoices.map(inv => `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="p-3 font-bold">${inv.invNo}</td>
+            <td class="p-3 text-slate-500">${inv.date}</td>
+            <td class="p-3 font-sans font-medium text-slate-800">${inv.custName}</td>
+            <td class="p-3 font-sans">${inv.items.length} items</td>
+            <td class="p-3 text-right font-bold text-neutral-900">${inv.grandTotal}</td>
+            <td class="p-3"><span class="text-[10px] px-2 py-0.5 rounded ${inv.payStatus === 'Credit' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}">${inv.payStatus}</span></td>
+            <td class="p-3 text-center space-x-2 font-sans">
+              <button onclick="reprintSavedBill(${inv.id})" class="text-blue-600 hover:underline">Reprint</button>
+            </td>
+          </tr>
+        `).join('');
+      };
+    }
+
+    function reprintSavedBill(id) {
+      const tx = db.transaction("invoices", "readonly");
+      tx.objectStore("invoices").get(id).onsuccess = function(e) {
+        const inv = e.target.result;
+        document.getElementById('printDocType').innerText = "DUPLICATE INVOICE";
+        document.getElementById('pRefNo').innerText = inv.invNo;
+        document.getElementById('pName').innerText = inv.custName;
+        document.getElementById('pPhone').innerText = inv.phone || 'N/A';
+        document.getElementById('pDate').innerText = inv.date;
+
+        document.getElementById('pTableHead').innerHTML = `
+          <tr>
+            <th class="py-2">Item Description</th>
+            <th class="py-2">Size / Detail</th>
+            <th class="py-2 text-right">Sq.Ft / Qty</th>
+            <th class="py-2 text-right">Rate</th>
+            <th class="py-2 text-right">Amount</th>
+          </tr>
+        `;
+
+        document.getElementById('pTableBody').innerHTML = inv.items.map(i => `
+          <tr>
+            <td class="py-2 font-sans font-medium">${i.name}</td>
+            <td class="py-2 text-slate-600 font-sans">${i.detail}</td>
+            <td class="py-2 text-right font-mono">${i.sqft ? i.sqft.toFixed(2) : '-'}</td>
+            <td class="py-2 text-right font-mono">₹${i.rate}</td>
+            <td class="py-2 text-right font-bold font-mono">₹${i.amount.toFixed(2)}</td>
+          </tr>
+        `).join('');
+
+        document.getElementById('pTotalsBlock').innerHTML = `
+          <p>Subtotal: ${inv.subtotal}</p>
+          <p>GST: ${inv.gst}</p>
+          <p>Discount: ₹${inv.discount}</p>
+          <p class="text-sm font-black border-t pt-1">Grand Total: ${inv.grandTotal}</p>
+          <p class="text-[10px] text-slate-500 uppercase">Status: ${inv.payStatus}</p>
+        `;
+
+        document.getElementById('printArea').classList.remove('hidden');
+        window.print();
+        document.getElementById('printArea').classList.add('hidden');
+      };
     }
   </script>
 </body>
